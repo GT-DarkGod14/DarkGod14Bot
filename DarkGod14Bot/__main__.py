@@ -225,7 +225,7 @@ def start(update: Update, context: CallbackContext):
                         [
                             InlineKeyboardButton(
                                 text="Source code",
-                                url="https://github.com/GT-DarkGod14/DarkGod14Robot",
+                                url="https://github.com/GT-DarkGod14/DarkGod14Bot",
                             )
                         ],
                         [

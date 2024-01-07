@@ -79,7 +79,7 @@ DEFAULT_WELCOME_MESSAGES = [
     "Welcome you are",
     "Welcome {first}, your princess is in another castle.",
     "Hi {first}, welcome to the dark side.",
-    "Hola {first}, beware of super users",
+    "Hola {first}, beware of god mode users",
     "Hey {first}, we have the droids you are looking for.",
     "Hi {first}\nThis isn't a strange place, this is my home, it's the people who are strange.",
     "Oh, hey {first} what's the password?",
