@@ -543,7 +543,7 @@ def left_member(update: Update, context: CallbackContext):
             # Give the owner a special goodbye
             if left_mem.id == OWNER_ID:
                 dispatcher.bot.send_message(chat.id,
-                    "Oi! Genos! He left..",
+                    "My owner left the group :(",
                 )
                 return
 
