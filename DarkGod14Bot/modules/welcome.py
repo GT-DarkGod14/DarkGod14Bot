@@ -208,12 +208,12 @@ def new_member(update: Update, context: CallbackContext):
         # Give the owner a special welcome
         if new_mem.id == OWNER_ID:
             deletion(update, context, dispatcher.bot.send_message(chat.id,
-                "Oh, Genos? Let's get this moving."
+                "My owner just joined the group"
             ))
             welcome_log = (
                 f"{html.escape(chat.title)}\n"
                 f"#USER_JOINED\n"
-                f"Bot Owner just joined the group"
+                f"My owner just joined the group"
             )
 
         # Welcome Devs
