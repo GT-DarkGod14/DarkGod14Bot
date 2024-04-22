@@ -1,4 +1,4 @@
-![DarkGod14Bot](https://i.imgur.com/hEbLAob.jpg)
+![DarkGod14Bot](https://i.imgur.com/LXiUxvu.jpeg)
 # DarkGod14Bot
 
 <p align="center">
