@@ -331,7 +331,7 @@ __help__ = """
 """
 
 MAGISK_HANDLER = CommandHandler(["magisk", "root", "su"], magisk, run_async=True)
-ORANGEFOX_HANDLER = CommandHandler(["ofox", "orangefox"], orangefox, run_async=True)
+ORANGEFOX_HANDLER = CommandHandler("orangefox", orangefox, run_async=True)
 TWRP_HANDLER = CommandHandler("twrp", twrp, run_async=True)
 GETFW_HANDLER = CommandHandler("getfw", getfw, run_async=True)
 CHECKFW_HANDLER = CommandHandler("checkfw", checkfw, run_async=True)
@@ -348,5 +348,5 @@ dispatcher.add_handler(PHH_HANDLER)
 dispatcher.add_handler(MIUI_HANDLER)
 
 __mod_name__ = "Android"
-__command_list__ = ["magisk", "root", "su", "ofox", "orangefox", "twrp", "checkfw", "getfw", "phh", "miui"]
+__command_list__ = ["magisk", "root", "su", "orangefox", "twrp", "checkfw", "getfw", "phh", "miui"]
 __handlers__ = [MAGISK_HANDLER, ORANGEFOX_HANDLER, TWRP_HANDLER, GETFW_HANDLER, CHECKFW_HANDLER, PHH_HANDLER, MIUI_HANDLER]
