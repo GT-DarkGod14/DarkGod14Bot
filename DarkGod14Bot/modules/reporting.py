@@ -19,7 +19,6 @@ from telegram.utils.helpers import mention_html
 REPORT_GROUP = 12
 REPORT_IMMUNE_USERS = SUDO_USERS + WHITELIST_USERS
 
-
 @user_admin
 def report_setting(update: Update, context: CallbackContext):
     bot, args = context.bot, context.args
@@ -63,22 +62,29 @@ def report_setting(update: Update, context: CallbackContext):
                 parse_mode=ParseMode.MARKDOWN,
             )
 
-
 @user_not_admin
 @loggable
 def report(update: Update, context: CallbackContext) -> str:
     bot = context.bot
-    args = context.args
     message = update.effective_message
     chat = update.effective_chat
     user = update.effective_user
+    
+    if context.args:
+        args = context.args
+    else:
+        text = message.text.split()
+        if len(text) > 1:
+            args = text[1:]
+        else:
+            args = []
+
     reply_markup = None
 
     if chat and message.reply_to_message and sql.chat_should_report(chat.id):
         reported_user = message.reply_to_message.from_user
         chat_name = chat.title or chat.first or chat.username
         admin_list = chat.get_administrators()
-        message = update.effective_message
 
         if not args:
             message.reply_text("Add a reason for reporting first.")
@@ -97,7 +103,6 @@ def report(update: Update, context: CallbackContext) -> str:
             return ""
 
         if chat.username and chat.type == Chat.SUPERGROUP:
-
             reported = f"{mention_html(user.id, user.first_name)} reported {mention_html(reported_user.id, reported_user.first_name)} to the admins!"
 
             msg = (
@@ -156,10 +161,9 @@ def report(update: Update, context: CallbackContext) -> str:
                         if should_forward:
                             message.reply_to_message.forward(admin.user.id)
 
-                            if (
-                                len(message.text.split()) > 1
-                            ):  # If user is giving a reason, send his message too
+                            if len(args) > 0:
                                 message.forward(admin.user.id)
+
                     if not chat.username:
                         bot.send_message(
                             admin.user.id, msg + link, parse_mode=ParseMode.HTML
@@ -168,9 +172,7 @@ def report(update: Update, context: CallbackContext) -> str:
                         if should_forward:
                             message.reply_to_message.forward(admin.user.id)
 
-                            if (
-                                len(message.text.split()) > 1
-                            ):  # If user is giving a reason, send his message too
+                            if len(args) > 0:
                                 message.forward(admin.user.id)
 
                     if chat.username and chat.type == Chat.SUPERGROUP:
@@ -184,9 +186,7 @@ def report(update: Update, context: CallbackContext) -> str:
                         if should_forward:
                             message.reply_to_message.forward(admin.user.id)
 
-                            if (
-                                len(message.text.split()) > 1
-                            ):  # If user is giving a reason, send his message too
+                            if len(args) > 0:
                                 message.forward(admin.user.id)
 
                 except Unauthorized:
@@ -201,23 +201,6 @@ def report(update: Update, context: CallbackContext) -> str:
         return msg
 
     return ""
-
-
-def __migrate__(old_chat_id, new_chat_id):
-    sql.migrate_chat(old_chat_id, new_chat_id)
-
-
-def __chat_settings__(chat_id, _):
-    return f"This chat is setup to send user reports to admins, via /report and @admin: `{sql.chat_should_report(chat_id)}`"
-
-
-def __user_settings__(user_id):
-    if sql.user_should_report(user_id) is True:
-        text = "You will receive reports from chats you're admin."
-    else:
-        text = "You will *not* receive reports from chats you're admin."
-    return text
-
 
 def buttons(update: Update, context: CallbackContext):
     bot = context.bot
@@ -261,10 +244,22 @@ def buttons(update: Update, context: CallbackContext):
             )
             query.answer("🛑 Failed to delete message!")
 
+def __migrate__(old_chat_id, new_chat_id):
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
+def __chat_settings__(chat_id, _):
+    return f"This chat is setup to send user reports to admins, via /report and @admin: `{sql.chat_should_report(chat_id)}`"
+
+def __user_settings__(user_id):
+    if sql.user_should_report(user_id) is True:
+        text = "You will receive reports from chats you're admin."
+    else:
+        text = "You will *not* receive reports from chats you're admin."
+    return text
 
 __help__ = """
  • `/report <reason>`*:* reply to a message to report it to admins.
- • `@admin`*:* reply to a message to report it to admins.
+ • `@admin <reason>`*:* reply to a message to report it to admins.
 *NOTE:* Neither of these will get triggered if used by admins.
 
 *Admins only:*

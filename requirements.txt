@@ -45,5 +45,3 @@ pretty_errors
 tswift
 PyYAML
 humanize
-pytube
-moviepy

@@ -180,7 +180,7 @@ When marked as AFK, any mentions will be replied to with a message to say you're
 
 AFK_HANDLER = DisableAbleCommandHandler("afk", afk, run_async=True)
 AFK_REGEX_HANDLER = DisableAbleMessageHandler(
-    Filters.regex(r"^(?i)brb(.*)$"), afk, friendly="afk"
+    Filters.regex(r"(?i)^brb(.*)$"), afk, friendly="afk"
 )
 NO_AFK_HANDLER = MessageHandler(Filters.all & Filters.chat_type.groups, no_longer_afk, run_async=True)
 AFK_REPLY_HANDLER = MessageHandler(Filters.all & Filters.chat_type.groups, reply_afk, run_async=True)

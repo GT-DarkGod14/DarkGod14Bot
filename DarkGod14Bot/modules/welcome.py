@@ -172,6 +172,7 @@ def welcomeFilter(update: Update, context: CallbackContext):
 
 @loggable
 def new_member(update: Update, context: CallbackContext):
+    keyboard = None
     bot, job_queue = context.bot, context.job_queue
     chat = update.effective_chat
     user = update.effective_user
