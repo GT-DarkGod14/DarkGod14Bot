@@ -1,16 +1,16 @@
 # Config files, logs and stuff
-AstrakoBot/modules/helper_funcs/temp.txt
-AstrakoBot/elevated_users.json
-AstrakoBot/config.py
-AstrakoBot/config.ini
+DarkGod14Bot/modules/helper_funcs/temp.txt
+DarkGod14Bot/elevated_users.json
+DarkGod14Bot/config.py
+DarkGod14Bot/config.ini
 log.txt
 kangsticker.png
 updates.txt
 
 # Session files
-AstrakoBot/*.session
-AstrakoBot/*.session-journal
-astrakobot.session-journal
+DarkGod14Bot/*.session
+DarkGod14Bot/*.session-journal
+DarkGod14Bot.session-journal
 *.session-journal
 *.session
 

@@ -1,52 +1,62 @@
-![AstrakoBot](https://i.imgur.com/1oah5E2.jpg)
-# AstrakoBot 
+![DarkGod14Bot](https://i.imgur.com/LXiUxvu.jpeg)
+# DarkGod14Bot
+
 <p align="center">
-<a href="https://www.codacy.com/gh/Astrako/AstrakoBot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Astrako/AstrakoBot&amp;utm_campaign=Badge_Grade" alt="Codacy Badge">
+<a href="https://www.codacy.com/gh/GT-DarkGod14/DarkGod14Bot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GT-DarkGod14/DarkGod14Bot&amp;utm_campaign=Badge_Grade" alt="Codacy Badge">
 <img src="https://app.codacy.com/project/badge/Grade/972e73015aaa4096bf109a79acae8afb" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot" alt="Libraries.io dependency status for GitHub repo"> <img src="https://img.shields.io/librariesio/github/Astrako/AstrakoBot?style=flat&logo=github&color=red" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot/network/members" alt="GitHub stars"> <img src="https://img.shields.io/github/stars/Astrako/AstrakoBot?style=flat&logo=github&color=yellow" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot/network/members" alt="GitHub forks"> <img src="https://img.shields.io/github/forks/Astrako/AstrakoBot" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/network/members" alt="GitHub stars"> <img src="https://img.shields.io/github/stars/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=yellow" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/network/members" alt="GitHub forks"> <img src="https://img.shields.io/github/forks/GT-DarkGod14/DarkGod14Bot" /> </a>
 </p>
 <p align="center">
-<a href="https://github.com/Astrako/AstrakoBot" alt="GitHub commit activity"> <img src="https://img.shields.io/github/commit-activity/m/Astrako/AstrakoBot" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot/graphs/contributors" alt="GitHub contributors"> <img src="https://img.shields.io/github/contributors/Astrako/AstrakoBot?style=flat&logo=github" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot" alt="GitHub closed pull requests"> <img src="https://img.shields.io/github/issues-pr-closed-raw/Astrako/AstrakoBot?color=success" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot" alt="GitHub issues"> <img src="https://img.shields.io/github/issues-raw/Astrako/AstrakoBot?style=flat&logo=github&color=red" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot" alt="GitHub closed issues"> <img src="https://img.shields.io/github/issues-closed-raw/Astrako/AstrakoBot?style=flat&logo=github&color=success" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub commit activity"> <img src="https://img.shields.io/github/commit-activity/m/GT-DarkGod14/DarkGod14Bot" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/graphs/contributors" alt="GitHub contributors"> <img src="https://img.shields.io/github/contributors/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub closed pull requests"> <img src="https://img.shields.io/github/issues-pr-closed-raw/GT-DarkGod14/DarkGod14Bot?color=success" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub issues"> <img src="https://img.shields.io/github/issues-raw/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=red" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub closed issues"> <img src="https://img.shields.io/github/issues-closed-raw/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=success" /> </a>
 </p>
 <p align="center">
 <a href="https://www.python.org/" alt="made-with-python"> <img src="https://img.shields.io/badge/made%20with-Python-1f425f.svg?style=flat&logo=python&color=blue" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot" alt="Python supported versions"> <img src="https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot" alt="Ptb version"> <img src="https://img.shields.io/badge/Ptb-v13.11-blue" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot" alt="GitHub repo size"> <img src="https://img.shields.io/github/repo-size/Astrako/AstrakoBot" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot/blob/master/LICENSE" alt="GPLv3 license"> <img src="https://img.shields.io/github/license/Astrako/AstrakoBot?style=flat&logo=github&color=success" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="Python supported versions"> <img src="https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="pypi version"> <img src="https://img.shields.io/badge/pypi-v13.5-blue" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub repo size"> <img src="https://img.shields.io/github/repo-size/GT-DarkGod14/DarkGod14Bot" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/blob/master/LICENSE" alt="GPLv3 license"> <img src="https://img.shields.io/github/license/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=success" /> </a>
 </p>
 <p align="center">
-<a href="" alt="Astrako"> <img src="https://img.shields.io/badge/built%20by-Astrako-blue" /> </a>
-<a href="https://github.com/Astrako/AstrakoBot/graphs/commit-activity" alt="Maintenance"> <img src="https://img.shields.io/badge/maintained%3F-yes-blue.svg" /> </a>
+<a href="" alt="DarkGod14"> <img src="https://img.shields.io/badge/built%20by-DarkGod14-blue" /> </a>
+<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/graphs/commit-activity" alt="Maintenance"> <img src="https://img.shields.io/badge/maintained%3F-yes-blue.svg" /> </a>
 <a href="https://makeapullrequest.com" alt="PRs Welcome"> <img src="https://img.shields.io/badge/PRs-welcome-blue.svg" /> </a>
 </p>
 
 A modular Telegram Python bot running on python3 with a sqlalchemy database.
 
-Originally a SaitamaRobot fork, AstrakoBot evolved further and was built to be more robust. 
+Originally a AstrakoBot fork, DarkGod14Bot evolved further and was built to be more robust. 
 
-* Bot link:  <a href="https://t.me/AstrakoBot" alt="AstrakoBot"> <img src="https://img.shields.io/badge/%F0%9F%A4%96%20-AstrakoBot-blue" /> </a>
+* Bot link:  <a href="https://t.me/DarkGod14Bot" alt="DarkGod14Bot"> <img src="https://img.shields.io/badge/%F0%9F%A4%96%20-DarkGod14Bot-blue" /> </a>
 
-* Support group:  <a href="https://t.me/AstrakoBotSupport" alt="AstrakoBotSupport"> <img src="https://aleen42.github.io/badges/src/telegram.svg" /> </a>
-
-* Recommended federation:  <a href="https://t.me/ALTF4Fed" alt="ALTF4Fed"> <img src="https://img.shields.io/badge/🚫-ALTF4Fed-red" /> </a>
-
-In support group you can ask for help, discover/request new features, report bugs, and stay in the loop whenever a new update is available. 
-
+* Recommended federation:  <a href="https://t.me/AltGodnessFed" alt="GodnessFed"> <img src="https://img.shields.io/badge/🚫-GodnessFed-red" /> </a>
 
 ## How to setup/deploy.
 
 ### Read these notes carefully before proceeding 
- - Edit any mentions of @AstrakoBotSupport to your own support chat
- - Your code must be open source and a link to your fork's repository must be there in the start reply of the bot
+ - Your code must be open source and a link to your fork's repository must be there in the start reply of the bot [See this](https://github.com/GT-DarkGod14/DarkGod14Bot/blob/master/DarkGod14Bot/__main__.py#L13)
+ - Lastly, if you are found to run this repo without the code being open sourced or the repository link not mentioned in the bot, we will push a gban for you in our network because of being in violation of the license, you are free to be a dick and not respect the open source code (we do not mind) but we will not be having you around our chats
  - This repo does not come with technical support, so DO NOT come to us asking help about deploy/console errors
- 
+
+
+ <details>
+  <summary>Steps to deploy on Heroku !! </summary>
+
+```
+Fill in all the details, Deploy!
+Now go to https://dashboard.heroku.com/apps/(app-name)/resources ( Replace (app-name) with your app name )
+REMEMBER: Turn on worker dyno (Don't worry It's free :D) & Webhook
+Now send the bot /start, If it doesn't respond go to https://dashboard.heroku.com/apps/(app-name)/settings and remove webhook and port.
+```
+
+  [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/GT-DarkGod14/DarkGod14Bot.git)
+
+</details>  
+
 <details>
   <summary>Steps to self Host!! </summary>
 
@@ -59,7 +69,7 @@ This is because markdown parsing is done by iterating through a dict, which is o
 There are two possible ways of configuring your bot: a config.py file, or ENV variables.
 
 The preferred version is to use a `config.py` file, as it makes it easier to see all your settings grouped together.
-This file should be placed in your `AstrakoBot` folder, alongside the `__main__.py` file. 
+This file should be placed in your `DarkGod14Bot` folder, alongside the `__main__.py` file. 
 This is where your bot token will be loaded from, as well as your database URI (if you're using a database), and most of
 your other settings.
 
@@ -68,7 +78,7 @@ defaults set in the sample_config, hence making it easier to upgrade.
 
 An example `config.py` file could be:
 ```
-from AstrakoBot.sample_config import Config
+from DarkGod14Bot.sample_config import Config
 
 class Development(Config):
     OWNER_ID = 254318997  # your telegram ID
@@ -154,7 +164,7 @@ All that is needed is that your .py file is in the modules folder.
 
 To add commands, make sure to import the dispatcher via
 
-`from AstrakoBot import dispatcher`.
+`from DarkGod14Bot import dispatcher`.
 
 You can then add commands using the usual
 
@@ -172,12 +182,9 @@ through the `/stats` command, which is only available to the bot owner.
 
 ## Starting the bot.
 
-Once you've set up your database and your configuration is complete, simply run (Linux):
+Once you've set up your database and your configuration is complete, simply run the bat file(if on windows) or run (Linux):
 
-`python3 -m AstrakoBot`
-
-For queries or any issues regarding the bot please open an issue ticket or visit us at [AstrakoBotSupport](https://t.me/AstrakoBotSupport)
-
+`python3 -m DarkGod14Bot`
 
 ## Credits
 The bot is based on the original work done by [PaulSonOfLars](https://github.com/PaulSonOfLars) and [AnimeKaizoku](https://github.com/AnimeKaizoku)
@@ -185,4 +192,3 @@ All original credits go to Paul and AnimeKaizoku, Without their efforts, this fo
 
 Any other authorship/credits can be seen through the commits.
 
-Should any be missing kindly let us know at [AstrakoBotSupport](https://t.me/AstrakoBotSupport) or simply submit a pull request on the readme.
