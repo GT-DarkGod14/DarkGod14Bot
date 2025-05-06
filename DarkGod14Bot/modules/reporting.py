@@ -62,7 +62,6 @@ def report_setting(update: Update, context: CallbackContext):
                 parse_mode=ParseMode.MARKDOWN,
             )
 
-
 @user_not_admin
 @loggable
 def report(update: Update, context: CallbackContext) -> str:
@@ -104,7 +103,6 @@ def report(update: Update, context: CallbackContext) -> str:
             return ""
 
         if chat.username and chat.type == Chat.SUPERGROUP:
-
             reported = f"{mention_html(user.id, user.first_name)} reported {mention_html(reported_user.id, reported_user.first_name)} to the admins!"
 
             msg = (
@@ -204,23 +202,6 @@ def report(update: Update, context: CallbackContext) -> str:
 
     return ""
 
-
-def __migrate__(old_chat_id, new_chat_id):
-    sql.migrate_chat(old_chat_id, new_chat_id)
-
-
-def __chat_settings__(chat_id, _):
-    return f"This chat is setup to send user reports to admins, via /report and @admin: `{sql.chat_should_report(chat_id)}`"
-
-
-def __user_settings__(user_id):
-    if sql.user_should_report(user_id) is True:
-        text = "You will receive reports from chats you're admin."
-    else:
-        text = "You will *not* receive reports from chats you're admin."
-    return text
-
-
 def buttons(update: Update, context: CallbackContext):
     bot = context.bot
     query = update.callback_query
@@ -263,6 +244,18 @@ def buttons(update: Update, context: CallbackContext):
             )
             query.answer("🛑 Failed to delete message!")
 
+def __migrate__(old_chat_id, new_chat_id):
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
+def __chat_settings__(chat_id, _):
+    return f"This chat is setup to send user reports to admins, via /report and @admin: `{sql.chat_should_report(chat_id)}`"
+
+def __user_settings__(user_id):
+    if sql.user_should_report(user_id) is True:
+        text = "You will receive reports from chats you're admin."
+    else:
+        text = "You will *not* receive reports from chats you're admin."
+    return text
 
 __help__ = """
  • `/report <reason>`*:* reply to a message to report it to admins.
