@@ -26,6 +26,12 @@ COLORS = [
 ]
 
 
+def get_text_dimensions(text, font):
+    left, top, right, bottom = font.getbbox(text)
+    width = right - left
+    height = bottom - top
+    return (width, height)
+
 async def process(msg, user, client, reply, replied=None):
     # Importing fonts and gettings the size of text
     font = ImageFont.truetype("resources/Roboto-Medium.ttf", 43, encoding="utf-16")
@@ -43,19 +49,19 @@ async def process(msg, user, client, reply, replied=None):
         if length > 43:
             text += textwrap.wrap(line, 43)
             maxlength = 43
-            if width < fallback.getsize(line[:43])[0]:
+            if width < get_text_dimensions(line[:43], fallback)[0]:
                 if "MessageEntityCode" in str(reply.entities):
-                    width = mono.getsize(line[:43])[0] + 30
+                    width = get_text_dimensions(line[:43], mono)[0] + 30
                 else:
-                    width = fallback.getsize(line[:43])[0]
+                    width = get_text_dimensions(line[:43], fallback)[0]
             next
         else:
             text.append(line + "\n")
-            if width < fallback.getsize(line)[0]:
+            if width < get_text_dimensions(line, fallback)[0]:
                 if "MessageEntityCode" in str(reply.entities):
-                    width = mono.getsize(line)[0] + 30
+                    width = get_text_dimensions(line, mono)[0] + 30
                 else:
-                    width = fallback.getsize(line)[0]
+                    width = get_text_dimensions(line, fallback)[0]
             if maxlength < length:
                 maxlength = length
 
@@ -72,7 +78,7 @@ async def process(msg, user, client, reply, replied=None):
         pass
     except TypeError:
         pass
-    titlewidth = font2.getsize(title)[0]
+    titlewidth = get_text_dimensions(title, font2)[0]
 
     # Get user name
     tot = (
@@ -83,7 +89,7 @@ async def process(msg, user, client, reply, replied=None):
         "Bot"
     )
 
-    namewidth = fallback.getsize(tot)[0] + 10
+    namewidth = get_text_dimensions(tot, fallback)[0] + 10
 
     if namewidth > width:
         width = namewidth
@@ -136,14 +142,14 @@ async def process(msg, user, client, reply, replied=None):
             getattr(replied.sender, 'username', '') or
             "Bot"
         )
-        replywidth = font2.getsize(reptot)[0]
+        replywidth = get_text_dimensions(reptot, font2)[0]
         if reply.sticker:
             sticker = await reply.download_media()
             stimg = Image.open(sticker)
             canvas = canvas.resize((stimg.width + pfpbg.width, stimg.height + 160))
             top = Image.new("RGBA", (200 + stimg.width, 300), (29, 29, 29, 255))
             draw = ImageDraw.Draw(top)
-            await replied_user(draw, reptot, replied.message.replace("\n", " "), 20)
+            await replied_user(draw, reptot, replied.message.replace("\n", " "), 20, len(title), title)
             top = top.crop((135, 70, top.width, 300))
             canvas.paste(pfpbg, (0, 0))
             canvas.paste(top, (pfpbg.width + 10, 0))
@@ -173,6 +179,7 @@ async def process(msg, user, client, reply, replied=None):
             replied.message.replace("\n", " "),
             maxlength + len(title),
             len(title),
+            title,
         )
         y = 200
     elif reply.sticker:
@@ -185,7 +192,7 @@ async def process(msg, user, client, reply, replied=None):
         return True, canvas
     elif reply.document and not reply.audio and not reply.audio:
         docname = ".".join(reply.document.attributes[-1].file_name.split(".")[:-1])
-        doctype = reply.document.attributes[-1].file_name.split(".")[-1].upper()
+        file_extension = reply.document.attributes[-1].file_name.split(".")[-1].upper()
         if reply.document.size < 1024:
             docsize = str(reply.document.size) + " Bytes"
         elif reply.document.size < 1048576:
@@ -195,9 +202,9 @@ async def process(msg, user, client, reply, replied=None):
         else:
             docsize = str(round(reply.document.size / 1024 ** 3, 2)) + " GB "
         docbglen = (
-            font.getsize(docsize)[0]
-            if font.getsize(docsize)[0] > font.getsize(docname)[0]
-            else font.getsize(docname)[0]
+            get_text_dimensions(docsize, font)[0]
+            if get_text_dimensions(docsize, font)[0] > get_text_dimensions(docname, font)[0]
+            else get_text_dimensions(docname, font)[0]
         )
         canvas = canvas.resize((pfpbg.width + width + docbglen, 160 + height))
         top, middle, bottom = await drawer(width + docbglen, height + 30)
@@ -205,7 +212,7 @@ async def process(msg, user, client, reply, replied=None):
         canvas.paste(top, (pfpbg.width, 0))
         canvas.paste(middle, (pfpbg.width, top.height))
         canvas.paste(bottom, (pfpbg.width, top.height + middle.height))
-        canvas = await doctype(docname, docsize, doctype, canvas)
+        canvas = await create_document_icon(docname, docsize, file_extension, canvas)
         y = 80 if text else 0
     else:
         canvas.paste(pfpbg, (0, 0))
@@ -225,10 +232,10 @@ async def process(msg, user, client, reply, replied=None):
         else:
             if not await fontTest(letter):
                 draw.text((space, 20), letter, font=namefallback, fill=color)
-                space += namefallback.getsize(letter)[0]
+                space += get_text_dimensions(letter, namefallback)[0]
             else:
                 draw.text((space, 20), letter, font=font, fill=color)
-                space += font.getsize(letter)[0]
+                space += get_text_dimensions(letter, font)[0]
 
     # Writing all separating emojis and regular texts
     x = pfpbg.width + 30
@@ -275,10 +282,10 @@ async def process(msg, user, client, reply, replied=None):
             else:
                 if not await fontTest(letter):
                     draw.text((x, y), letter, font=textfallback, fill=textcolor)
-                    x += textfallback.getsize(letter)[0]
+                    x += get_text_dimensions(letter, textfallback)[0]
                 else:
                     draw.text((x, y), letter, font=font2, fill=textcolor)
-                    x += font2.getsize(letter)[0]
+                    x += get_text_dimensions(letter, font2)[0]
             msg = msg.replace(letter, "¶", 1)
         y += 40
         x = pfpbg.width + 30
@@ -332,7 +339,7 @@ async def get_entity(msg):
     return bold, mono, italic, link
 
 
-async def doctype(name, size, type, canvas):
+async def create_document_icon(name, size, filetype, canvas):
     font = ImageFont.truetype("resources/Roboto-Medium.ttf", 38)
     doc = Image.new("RGBA", (130, 130), (29, 29, 29, 255))
     draw = ImageDraw.Draw(doc)
@@ -343,7 +350,7 @@ async def doctype(name, size, type, canvas):
     canvas.paste(doc, (160, 23))
     draw2 = ImageDraw.Draw(canvas)
     draw2.text((320, 40), name, font=font, fill="white")
-    draw2.text((320, 97), size + type, font=font, fill="#AAAAAA")
+    draw2.text((320, 97), size + filetype, font=font, fill="#AAAAAA")
     return canvas
 
 
@@ -389,7 +396,7 @@ async def transparent(emoji):
     return emoji, mask
 
 
-async def replied_user(draw, tot, text, maxlength, title):
+async def replied_user(draw, tot, text, maxlength, title_len, title):
     namefont = ImageFont.truetype("resources/Roboto-Medium.ttf", 38)
     namefallback = ImageFont.truetype("resources/Quivira.otf", 38)
     textfont = ImageFont.truetype("resources/Roboto-Regular.ttf", 32)
@@ -401,21 +408,21 @@ async def replied_user(draw, tot, text, maxlength, title):
     for letter in tot:
         if not await fontTest(letter):
             draw.text((180 + space, 86), letter, font=namefallback, fill="#888888")
-            space += namefallback.getsize(letter)[0]
+            space += get_text_dimensions(letter, namefallback)[0]
         else:
             draw.text((180 + space, 86), letter, font=namefont, fill="#888888")
-            space += namefont.getsize(letter)[0]
+            space += get_text_dimensions(letter, namefont)[0]
     space = 0
     for letter in text:
         if not await fontTest(letter):
             draw.text((180 + space, 132), letter, font=textfallback, fill="#888888")
-            space += textfallback.getsize(letter)[0]
+            space += get_text_dimensions(letter, textfallback)[0]
         else:
             draw.text((180 + space, 132), letter, font=textfont, fill="white")
-            space += textfont.getsize(letter)[0]
+            space += get_text_dimensions(letter, textfont)[0]
 
 
-@telethn.on(events.NewMessage(pattern="^[!/]quotly$"))
+@telethn.on(events.NewMessage(pattern="^[!/](?:quotly|q)$"))
 async def quotly(event):
     if event.fwd_from:
         return
