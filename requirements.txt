@@ -28,7 +28,7 @@ wikipedia
 telethon
 spamwatch
 alphabet_detector
-pyrate-limiter==2.10.0
+pyrate-limiter==2.8.1
 covid
 datetime
 pytz
@@ -46,4 +46,4 @@ tswift
 PyYAML
 humanize
 pytube
-moviepy
+moviepy==1.0.3

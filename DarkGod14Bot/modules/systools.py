@@ -148,7 +148,7 @@ def status(update: Update, context: CallbackContext):
     swap = psutil.swap_memory()
     msg += f"SWAP: `{get_size(swap.total)} - {get_size(swap.used)} used ({swap.percent}%)`\n"
     upload, download = get_network_speed()
-    msg += f"Network: `? {get_size(download)}/s | ? {get_size(upload)}/s`\n"
+    msg += f"Network: `⬇ {get_size(download)}/s | ⬆ {get_size(upload)}/s`\n"
 
     message.reply_text(
         text = msg,
