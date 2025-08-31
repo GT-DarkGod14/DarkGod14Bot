@@ -221,7 +221,7 @@ Blue text cleaner removed any made up commands that people send in your chat.
  • `/unignoreblue <word>`*:* remove prevent auto cleaning of the command
  • `/listblue`*:* list currently whitelisted commands
  
- *Following are God Mode only commands, admins cannot use these:*
+ *Following are God users only commands, admins cannot use these:*
  • `/gignoreblue <word>`*:* globally ignorea bluetext cleaning of saved word across DarkGod14Bot.
  • `/ungignoreblue <word>`*:* remove said command from global cleaning list
 """

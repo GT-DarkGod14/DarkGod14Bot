@@ -41,7 +41,7 @@ def bl_user(update: Update, context: CallbackContext) -> str:
         return ""
 
     if user_id in BLACKLISTWHITELIST:
-        message.reply_text("No!\nNoticing god mode users is my job.")
+        message.reply_text("No!\nNoticing god users is my job.")
         return ""
 
     try:

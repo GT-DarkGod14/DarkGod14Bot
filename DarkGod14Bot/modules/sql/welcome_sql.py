@@ -65,7 +65,7 @@ DEFAULT_WELCOME_MESSAGES = [
     "Welcome {first}, leaving is not an option!",
     "Run Forest! ..I mean...{first}.",
     "{first} do 100 push-ups, 100 sit-ups, 100 squats, and 10km running EVERY SINGLE DAY!!!",  # One Punch ma
-    "Huh?\nDid a god mode user just join?\nOh wait, it's just {first}.",  # One Punch ma
+    "Huh?\nDid a god user just join?\nOh wait, it's just {first}.",  # One Punch ma
     "Hey, {first}, ever heard the King Engine?",  # One Punch ma
     "Hey, {first}, empty your pockets.",
     "Hey, {first}!, are you strong?",
@@ -79,7 +79,7 @@ DEFAULT_WELCOME_MESSAGES = [
     "Welcome you are",
     "Welcome {first}, your princess is in another castle.",
     "Hi {first}, welcome to the dark side.",
-    "Hola {first}, beware of god mode users",
+    "Hola {first}, beware of god users",
     "Hey {first}, we have the droids you are looking for.",
     "Hi {first}\nThis isn't a strange place, this is my home, it's the people who are strange.",
     "Oh, hey {first} what's the password?",

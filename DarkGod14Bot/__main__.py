@@ -20,6 +20,10 @@ from DarkGod14Bot import (
     telethn,
     updater,
     DROP_UPDATES,
+    DEV_USERS,
+    SUDO_USERS,
+    SUPPORT_USERS,
+    WHITELIST_USERS,
 )
 
 # needed to dynamically load modules
@@ -87,7 +91,9 @@ HELP_STRINGS = """
  • /settings:
    • in PM: will send you your settings for all supported modules.
    • in a group: will redirect you to pm, with all that chat's settings.
-{}
+
+*{}*{}
+
 And the following:
 """.format(
     dispatcher.bot.first_name,
@@ -104,8 +110,92 @@ DATA_IMPORT = []
 DATA_EXPORT = []
 CHAT_SETTINGS = {}
 USER_SETTINGS = {}
+RESTRICTED_MODULES = {}
 
 GDPR = []
+
+def user_has_permission(user_id: int, min_level: str) -> bool:
+    if not user_id:
+        return False
+    
+    if min_level == "whitelist":
+        return (user_id in WHITELIST_USERS or 
+                user_id in SUPPORT_USERS or 
+                user_id in SUDO_USERS or 
+                user_id in DEV_USERS)
+    elif min_level == "support":
+        return (user_id in SUPPORT_USERS or 
+                user_id in SUDO_USERS or 
+                user_id in DEV_USERS)
+    elif min_level == "sudo":
+        return user_id in SUDO_USERS or user_id in DEV_USERS
+    elif min_level == "dev":
+        return user_id in DEV_USERS
+    
+    return False
+
+def filter_modules_by_permission(module_dict: dict, user_id: int) -> dict:
+    if not user_id:
+        return {name: mod for name, mod in module_dict.items() 
+                if name not in RESTRICTED_MODULES}
+    
+    visible_modules = {}
+    for mod_name, mod in module_dict.items():
+        if mod_name in RESTRICTED_MODULES:
+            restriction_info = RESTRICTED_MODULES[mod_name]
+            if restriction_info['restricted']:
+                if user_has_permission(user_id, restriction_info['min_level']):
+                    visible_modules[mod_name] = mod
+            else:
+                visible_modules[mod_name] = mod
+        else:
+            visible_modules[mod_name] = mod
+    
+    return visible_modules
+
+def paginate_modules_filtered(page_n: int, module_dict, prefix, chat=None, user_id=None):
+    if user_id:
+        visible_modules = filter_modules_by_permission(module_dict, user_id)
+    else:
+        visible_modules = {name: mod for name, mod in module_dict.items() 
+                          if name not in RESTRICTED_MODULES}
+    
+    modules = list(visible_modules.keys())
+    if not modules:
+        return [[InlineKeyboardButton("No modules available", callback_data="help_back")]]
+    
+    buttons = []
+    modules_per_page = 3
+    total_modules = len(modules)
+    total_pages = (total_modules + modules_per_page - 1) // modules_per_page
+    
+    start_idx = page_n * modules_per_page
+    end_idx = min(start_idx + modules_per_page, total_modules)
+    
+    for module_name in modules[start_idx:end_idx]:
+        mod = visible_modules[module_name]
+        if chat:
+            callback_data = f"{prefix}_module({chat},{module_name})"
+        else:
+            callback_data = f"{prefix}_module({module_name})"
+        
+        buttons.append([InlineKeyboardButton(
+            mod.__mod_name__,
+            callback_data=callback_data
+        )])
+    
+    nav_buttons = []
+    if page_n > 0:
+        nav_buttons.append(InlineKeyboardButton("« Previous", 
+            callback_data=f"{prefix}_prev({chat},{page_n})" if chat else f"{prefix}_prev({page_n})"))
+    if page_n < total_pages - 1:
+        nav_buttons.append(InlineKeyboardButton("Next »", 
+            callback_data=f"{prefix}_next({chat},{page_n})" if chat else f"{prefix}_next({page_n})"))
+    
+    if nav_buttons:
+        buttons.append(nav_buttons)
+    
+    return buttons
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("DarkGod14Bot.modules." + module_name)
@@ -120,7 +210,13 @@ for module_name in ALL_MODULES:
     if hasattr(imported_module, "__help__") and imported_module.__help__:
         HELPABLE[imported_module.__mod_name__.lower()] = imported_module
 
-    # Chats to migrate on chat_migrated events
+    if hasattr(imported_module, "__mod_restricted__") and imported_module.__mod_restricted__:
+        min_level = getattr(imported_module, "__mod_min_level__", "sudo")
+        RESTRICTED_MODULES[imported_module.__mod_name__.lower()] = {
+            'restricted': True,
+            'min_level': min_level
+        }
+
     if hasattr(imported_module, "__migrate__"):
         MIGRATEABLE.append(imported_module)
 
@@ -146,10 +242,9 @@ for module_name in ALL_MODULES:
         USER_SETTINGS[imported_module.__mod_name__.lower()] = imported_module
 
 
-# do not async
-def send_help(chat_id, text, keyboard=None):
+def send_help(chat_id, text, keyboard=None, user_id=None):
     if not keyboard:
-        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help"))
+        keyboard = InlineKeyboardMarkup(create_help_keyboard(user_id))
     dispatcher.bot.send_message(
         chat_id=chat_id,
         text=text,
@@ -158,29 +253,69 @@ def send_help(chat_id, text, keyboard=None):
         reply_markup=keyboard,
     )
 
+def create_help_keyboard(user_id=None):
+    """Create the help keyboard with all available modules"""
+    if user_id:
+        visible_modules = filter_modules_by_permission(HELPABLE, user_id)
+    else:
+        visible_modules = {name: mod for name, mod in HELPABLE.items() 
+                          if name not in RESTRICTED_MODULES}
+    
+    buttons = []
+    current_row = []
+    
+    # Sort modules alphabetically
+    sorted_modules = sorted(visible_modules.items())
+    
+    for mod_name, mod in sorted_modules:
+        current_row.append(InlineKeyboardButton(
+            mod.__mod_name__,
+            callback_data=f"help_module({mod_name})"
+        ))
+        
+        # Create row of 3 buttons
+        if len(current_row) == 3:
+            buttons.append(current_row)
+            current_row = []
+    
+    # Add remaining buttons if any
+    if current_row:
+        buttons.append(current_row)
+    
+    return buttons
+
 
 def start(update: Update, context: CallbackContext):
     args = context.args
     uptime = get_readable_time((time.time() - StartTime))
+    user_id = update.effective_user.id
+    
     if update.effective_chat.type == "private":
         if len(args) >= 1:
             if args[0].lower() == "help":
-                send_help(update.effective_chat.id, HELP_STRINGS)
+                send_help(update.effective_chat.id, HELP_STRINGS, user_id=user_id)
             elif args[0].lower().startswith("ghelp_"):
                 mod = args[0].lower().split("_", 1)[1]
                 if not HELPABLE.get(mod, False):
                     return
+                
+                if mod in RESTRICTED_MODULES:
+                    if not user_has_permission(user_id, RESTRICTED_MODULES[mod]['min_level']):
+                        update.effective_message.reply_text("You don't have permission to access this module.")
+                        return
+                
                 send_help(
                     update.effective_chat.id,
                     HELPABLE[mod].__help__,
                     InlineKeyboardMarkup(
                         [[InlineKeyboardButton(text="Back", callback_data="help_back")]]
                     ),
+                    user_id=user_id
                 )
             elif args[0].lower() == "markdownhelp":
                 IMPORTED["extras"].markdown_help_sender(update)
-            elif args[0].lower() == "god_mode":
-                IMPORTED["god_mode"].send_god_mode(update)
+            elif args[0].lower() == "god_users":
+                IMPORTED["god_users"].send_god_users(update)
             elif args[0].lower().startswith("stngs_"):
                 match = re.match("stngs_(.*)", args[0].lower())
                 chat = dispatcher.bot.getChat(match.group(1))
@@ -259,6 +394,7 @@ def error_callback(update: Update, context: CallbackContext):
 
 def help_button(update: Update, context: CallbackContext):
     query = update.callback_query
+    user_id = update.effective_user.id
     mod_match = re.match(r"help_module\((.+?)\)", query.data)
     prev_match = re.match(r"help_prev\((.+?)\)", query.data)
     next_match = re.match(r"help_next\((.+?)\)", query.data)
@@ -267,6 +403,12 @@ def help_button(update: Update, context: CallbackContext):
     try:
         if mod_match:
             module = mod_match.group(1)
+            
+            if module in RESTRICTED_MODULES:
+                if not user_has_permission(user_id, RESTRICTED_MODULES[module]['min_level']):
+                    query.answer("You don't have permission to access this module.", show_alert=True)
+                    return
+            
             text = (
                 "Here is the help for the *{}* module:\n".format(
                     HELPABLE[module].__mod_name__
@@ -288,7 +430,7 @@ def help_button(update: Update, context: CallbackContext):
                 text=HELP_STRINGS,
                 parse_mode=ParseMode.MARKDOWN,
                 reply_markup=InlineKeyboardMarkup(
-                    paginate_modules(curr_page - 1, HELPABLE, "help")
+                    paginate_modules_filtered(curr_page - 1, HELPABLE, "help", user_id=user_id)
                 ),
             )
 
@@ -298,7 +440,7 @@ def help_button(update: Update, context: CallbackContext):
                 text=HELP_STRINGS,
                 parse_mode=ParseMode.MARKDOWN,
                 reply_markup=InlineKeyboardMarkup(
-                    paginate_modules(next_page + 1, HELPABLE, "help")
+                    paginate_modules_filtered(next_page + 1, HELPABLE, "help", user_id=user_id)
                 ),
             )
 
@@ -307,7 +449,7 @@ def help_button(update: Update, context: CallbackContext):
                 text=HELP_STRINGS,
                 parse_mode=ParseMode.MARKDOWN,
                 reply_markup=InlineKeyboardMarkup(
-                    paginate_modules(0, HELPABLE, "help")
+                    create_help_keyboard(user_id=user_id)
                 ),
             )
 
@@ -321,12 +463,19 @@ def help_button(update: Update, context: CallbackContext):
 
 def get_help(update: Update, context: CallbackContext):
     chat = update.effective_chat  # type: Optional[Chat]
+    user_id = update.effective_user.id
     args = update.effective_message.text.split(None, 1)
 
     # ONLY send help in PM
     if chat.type != chat.PRIVATE:
         if len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
             module = args[1].lower()
+            
+            if module in RESTRICTED_MODULES:
+                if not user_has_permission(user_id, RESTRICTED_MODULES[module]['min_level']):
+                    update.effective_message.reply_text("You don't have permission to access this module.")
+                    return
+            
             update.effective_message.reply_text(
                 f"Contact me in PM to get help of {module.capitalize()}",
                 reply_markup=InlineKeyboardMarkup(
@@ -360,6 +509,12 @@ def get_help(update: Update, context: CallbackContext):
 
     elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
         module = args[1].lower()
+        
+        if module in RESTRICTED_MODULES:
+            if not user_has_permission(user_id, RESTRICTED_MODULES[module]['min_level']):
+                update.effective_message.reply_text("You don't have permission to access this module.")
+                return
+        
         text = (
             "Here is the available help for the *{}* module:\n".format(
                 HELPABLE[module].__mod_name__
@@ -372,10 +527,11 @@ def get_help(update: Update, context: CallbackContext):
             InlineKeyboardMarkup(
                 [[InlineKeyboardButton(text="Back", callback_data="help_back")]]
             ),
+            user_id=user_id
         )
 
     else:
-        send_help(chat.id, HELP_STRINGS)
+        send_help(chat.id, HELP_STRINGS, user_id=user_id)
 
 
 def send_settings(chat_id, user_id, user=False):

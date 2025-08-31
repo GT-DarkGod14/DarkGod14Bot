@@ -39,18 +39,6 @@ def check_user_id(user_id: int, context: CallbackContext) -> Optional[str]:
     return reply
 
 
-# This can serve as a deeplink example.
-# god_mode =
-# """ Text here """
-
-# do not async, not a handler
-# def send_god_mode(update):
-#    update.effective_message.reply_text(
-#        god_mode, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
-
-### Deep link example ends
-
-
 @dev_plus
 @gloggable
 def addsudo(update: Update, context: CallbackContext) -> str:
@@ -591,7 +579,9 @@ dispatcher.add_handler(SUPPORTLIST_HANDLER)
 dispatcher.add_handler(SUDOLIST_HANDLER)
 dispatcher.add_handler(DEVLIST_HANDLER)
 
-__mod_name__ = "God Mode"
+__mod_name__ = "God Users"
+__mod_restricted__ = True
+__mod_min_level__ = "whitelist"
 __handlers__ = [
     SUDO_HANDLER,
     SUPPORT_HANDLER,
