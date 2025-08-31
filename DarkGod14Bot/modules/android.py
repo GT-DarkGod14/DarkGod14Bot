@@ -4,6 +4,8 @@
 
 
 from datetime import datetime
+import re
+from urllib.parse import quote
 from bs4 import BeautifulSoup
 from requests import get
 from telegram import Bot, Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
@@ -264,7 +266,21 @@ def miui(update: Update, context: CallbackContext):
 def orangefox(update: Update, context: CallbackContext):
     message = update.effective_message
     chat = update.effective_chat
-    device = message.text[len("/orangefox ") :]
+    args = context.args
+    
+    # Obtener el dispositivo desde argumentos o desde el texto del mensaje
+    if args:
+        device = args[0]
+    else:
+        # Detectar qué comando se usó para extraer correctamente el dispositivo
+        text = message.text.strip()
+        if text.startswith("/orangefox "):
+            device = text[len("/orangefox ") :].strip()
+        elif text.startswith("/ofox "):
+            device = text[len("/ofox ") :].strip()
+        else:
+            device = ""
+    
     btn = ""
 
     if device:
@@ -305,7 +321,7 @@ def orangefox(update: Update, context: CallbackContext):
             msg += f"• MD5: `{md5}`\n"
             btn = [[InlineKeyboardButton(text=f"Download", url = dl_link)]]
     else:
-        msg = 'Give me something to fetch, like:\n`/orangefox a3y17lte`'
+        msg = 'Give me something to fetch, like:\n`/orangefox a3y17lte` or `/ofox a3y17lte`'
 
     delmsg = message.reply_text(
         text = msg,
@@ -359,6 +375,153 @@ def twrp(update: Update, context: CallbackContext):
         context.dispatcher.run_async(delete, delmsg, cleartime.time)
 
 
+def specs(update: Update, context: CallbackContext):
+    message = update.effective_message
+    chat = update.effective_chat
+    args = context.args
+    if args:
+        device_query = " ".join(args)
+    else:
+        device_query = message.text[len("/specs "):].strip()
+    if not device_query:
+        msg = 'Give me something to search, like:\n`/specs iPhone 15 Pro`\nor\n`/specs Samsung Galaxy S24`'
+        delmsg = message.reply_text(text=msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+        cleartime = get_clearcmd(chat.id, "specs")
+        if cleartime:
+            context.dispatcher.run_async(delete, delmsg, cleartime.time)
+        return
+    search_msg = message.reply_text(f"🔍 Searching specifications for {device_query}...")
+    try:
+        search_url = f"https://www.gsmarena.com/results.php3?sQuickSearch=yes&sName={quote(device_query)}"
+        response = get(search_url, headers=rget_headers, timeout=10)
+        if response.status_code != 200:
+            msg = f"⚠️ Error searching for {device_query}"
+            search_msg.edit_text(msg)
+            return
+        soup = BeautifulSoup(response.content, 'html.parser')
+        device_links = []
+        makers_div = soup.find('div', class_='makers')
+        if makers_div:
+            links = makers_div.find_all('a', href=True)
+            for link in links:
+                href = link.get('href')
+                if href and href.endswith('.php'):
+                    device_links.append(f"https://www.gsmarena.com/{href}")
+        if not device_links:
+            msg = f"⚠️ No results found for {device_query}"
+            search_msg.edit_text(msg)
+            return
+        phone_url = None
+        device_query_lower = device_query.lower().replace(' ', '')
+        for link in device_links:
+            link_name = link.split('/')[-1].replace('.php', '').replace('_', ' ').replace('-', ' ')
+            link_name_clean = link_name.lower().replace(' ', '')
+            if link_name_clean == device_query_lower:
+                phone_url = link
+                break
+        if not phone_url:
+            best_match = None
+            best_score = 0
+            for link in device_links:
+                link_name = link.split('/')[-1].replace('.php', '').replace('_', ' ').replace('-', ' ')
+                link_name_clean = link_name.lower().replace(' ', '')
+                score = 0
+                query_words = device_query.lower().split()
+                link_words = link_name.lower().split()
+                matching_words = sum(1 for word in query_words if word in link_words)
+                score = matching_words / len(query_words) if query_words else 0
+                if device_query_lower in link_name_clean:
+                    score += 0.5
+                extra_words = len(link_words) - len(query_words)
+                if extra_words > 0:
+                    score -= (extra_words * 0.1)
+                if score > best_score:
+                    best_score = score
+                    best_match = link
+            phone_url = best_match if best_match else device_links[0]
+        phone_response = get(phone_url, headers=rget_headers, timeout=10)
+        if phone_response.status_code != 200:
+            msg = "⚠️ Error loading device page"
+            search_msg.edit_text(msg)
+            return
+        phone_soup = BeautifulSoup(phone_response.content, 'html.parser')
+        phone_name = None
+        name_elem = phone_soup.find('h1', class_='specs-phone-name-title')
+        if name_elem:
+            phone_name = name_elem.get_text().strip()
+        if not phone_name:
+            phone_name = device_query.title()
+        all_specs = {}
+        specs_div = phone_soup.find('div', {'id': 'specs-list'})
+        if specs_div:
+            tables = specs_div.find_all('table', {'cellspacing': '0'})
+            for table in tables:
+                current_category = None
+                rows = table.find_all('tr')
+                for row in rows:
+                    th = row.find('th', {'scope': 'row'})
+                    if th:
+                        current_category = th.get_text().strip()
+                        if current_category not in all_specs:
+                            all_specs[current_category] = {}
+                    ttl_cell = row.find('td', {'class': 'ttl'})
+                    nfo_cell = row.find('td', {'class': 'nfo'})
+                    if ttl_cell and nfo_cell:
+                        spec_name_elem = ttl_cell.find('a')
+                        if spec_name_elem:
+                            spec_name = spec_name_elem.get_text().strip()
+                        else:
+                            spec_name = ttl_cell.get_text().strip()
+                        spec_value = nfo_cell.get_text().strip()
+                        spec_value = re.sub(r'\s+', ' ', spec_value).strip()
+                        if spec_name and spec_value and spec_value != '-' and current_category:
+                            if len(spec_value) > 200:
+                                spec_value = spec_value[:200] + "..."
+                            all_specs[current_category][spec_name] = spec_value
+        if all_specs:
+            msg = f"*📱 {phone_name}*\n\n"
+            important_order = ['Network', 'Launch', 'Body', 'Display', 'Platform', 'Memory', 'Main Camera', 'Selfie Camera', 'Battery']
+            shown_categories = []
+            for category in important_order:
+                for cat_name, specs in all_specs.items():
+                    if category.lower() in cat_name.lower() and specs:
+                        msg += f"*{cat_name.upper()}*\n"
+                        count = 0
+                        for spec_name, spec_value in specs.items():
+                            if count < 5:
+                                if len(spec_value) > 100:
+                                    spec_value = spec_value[:100] + "..."
+                                msg += f"• *{spec_name}*: `{spec_value}`\n"
+                                count += 1
+                        msg += "\n"
+                        shown_categories.append(cat_name)
+                        break
+            for cat_name, specs in all_specs.items():
+                if cat_name not in shown_categories and len(msg) < 3500:
+                    if specs:
+                        msg += f"*{cat_name.upper()}*\n"
+                        count = 0
+                        for spec_name, spec_value in specs.items():
+                            if count < 3:
+                                if len(spec_value) > 100:
+                                    spec_value = spec_value[:100] + "..."
+                                msg += f"• *{spec_name}*: `{spec_value}`\n"
+                                count += 1
+                        msg += "\n"
+            if len(msg) > 4000:
+                msg = msg[:3900] + "\n\n`...truncated`"
+        else:
+            msg = f"*📱 {phone_name}*\n\n`⚠️ Could not extract specifications`\n`Try checking manually:` {phone_url}"
+    except Exception as e:
+        msg = f"⚠️ Error processing {device_query}: `{str(e)}`"
+    search_msg.delete()
+    delmsg = message.reply_text(text=msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+    cleartime = get_clearcmd(chat.id, "specs")
+    if cleartime:
+        context.dispatcher.run_async(delete, delmsg, cleartime.time)
+
+
+
 __help__ = """
 *Available commands:*\n
 *Magisk:* 
@@ -366,7 +529,7 @@ __help__ = """
 *KernelSU:*
 • `/kernelsu`: fetches latest kernelsu\n
 *OrangeFox Recovery Project:* 
-• `/orangefox` `<devicecodename>`: fetches lastest OrangeFox Recovery available for a given device codename\n
+• `/orangefox` or `/ofox` `<devicecodename>`: fetches lastest OrangeFox Recovery available for a given device codename\n
 *TWRP:* 
 • `/twrp <devicecodename>`: fetches lastest TWRP available for a given device codename\n
 *MIUI:*
@@ -375,17 +538,20 @@ __help__ = """
 • `/phh`: get lastest phh builds from github\n
 *Samsung:*
 • `/checkfw <model> <csc>` - Samsung only - shows the latest firmware info for the given device, taken from samsung servers
-• `/getfw <model> <csc>` - Samsung only - gets firmware download links from samfrew, sammobile and sfirmwares for the given device
+• `/getfw <model> <csc>` - Samsung only - gets firmware download links from samfrew, sammobile and sfirmwares for the given device\n
+*Specs:*
+• `/specs <device name>`: get phone specs and info
 """
 
 MAGISK_HANDLER = CommandHandler(["magisk", "root", "su"], magisk, run_async=True)
 KERNELSU_HANDLER = CommandHandler("kernelsu", kernelsu, run_async=True)
-ORANGEFOX_HANDLER = CommandHandler("orangefox", orangefox, run_async=True)
+ORANGEFOX_HANDLER = CommandHandler(["orangefox", "ofox"], orangefox, run_async=True)
 TWRP_HANDLER = CommandHandler("twrp", twrp, run_async=True)
 GETFW_HANDLER = CommandHandler("getfw", getfw, run_async=True)
 CHECKFW_HANDLER = CommandHandler("checkfw", checkfw, run_async=True)
 PHH_HANDLER = CommandHandler("phh", phh, run_async=True)
 MIUI_HANDLER = CommandHandler("miui", miui, run_async=True)
+SPECS_HANDLER = CommandHandler("specs", specs, run_async=True)
 
 dispatcher.add_handler(MAGISK_HANDLER)
 dispatcher.add_handler(KERNELSU_HANDLER)
@@ -395,7 +561,8 @@ dispatcher.add_handler(GETFW_HANDLER)
 dispatcher.add_handler(CHECKFW_HANDLER)
 dispatcher.add_handler(PHH_HANDLER)
 dispatcher.add_handler(MIUI_HANDLER)
+dispatcher.add_handler(SPECS_HANDLER)
 
 __mod_name__ = "Android"
-__command_list__ = ["magisk", "kernelsu", "root", "su", "orangefox", "twrp", "checkfw", "getfw", "phh", "miui"]
-__handlers__ = [MAGISK_HANDLER, KERNELSU_HANDLER, ORANGEFOX_HANDLER, TWRP_HANDLER, GETFW_HANDLER, CHECKFW_HANDLER, PHH_HANDLER, MIUI_HANDLER]
+__command_list__ = ["magisk", "kernelsu", "root", "su", "orangefox", "ofox", "twrp", "checkfw", "getfw", "phh", "miui", "specs"]
+__handlers__ = [MAGISK_HANDLER, KERNELSU_HANDLER, ORANGEFOX_HANDLER, TWRP_HANDLER, GETFW_HANDLER, CHECKFW_HANDLER, PHH_HANDLER, MIUI_HANDLER, SPECS_HANDLER]
