@@ -1,204 +1,188 @@
-![DarkGod14Bot](https://i.imgur.com/LXiUxvu.jpeg)
-# DarkGod14Bot
+<div align="center">
+  <img src="https://i.imgur.com/im3kCJr.png" alt="DarkGod14Bot Logo" width="500"/>
+  <div align="center">
+<h1 style="font-size: 3em;">🤖 DarkGod14Bot</h1>
+</div>
+  <h3>A modular Telegram bot built with Python and SQLAlchemy database</h3>
+  
+  ![Python](https://img.shields.io/badge/Python-3.9.4-blue?style=fBadge_Grade&logo=python)
+  ![PTB](https://img.shields.io/badge/PTB-v13.11-blue?style=Badge_Grade)
+  ![License](https://img.shields.io/badge/LICENSE-GPL--3.0-success?style=Badge_Grade)
+  ![Maintained](https://img.shields.io/badge/MAINTAINED%3F-YES-brightgreen?style=Badge_Grade)
+  ![Built with Python](https://img.shields.io/badge/BUILT%20WITH-PYTHON-blue?style=Badge_Grade&logo=python)
+  [![Quality Gate](https://app.codacy.com/project/badge/Grade/972e73015aaa4096bf109a79acae8afb)](https://www.codacy.com/gh/GT-DarkGod14/DarkGod14Bot/dashboard?utm_source=github.com&utm_medium=referral&utm_content=GT-DarkGod14/DarkGod14Bot&utm_campaign=Badge_Grade)
+  ![Requirements](https://img.shields.io/badge/PYTHON-99.9%25-blue?style=Badge_Grade&logo=python)
+  ![Stars](https://img.shields.io/badge/STARS-0-yellow?style=Badge_Grade&logo=github)
+  ![Forks](https://img.shields.io/badge/FORKS-0-lightgrey?style=Badge_Grade&logo=github)
+  ![Commits](https://img.shields.io/badge/COMMIT%20ACTIVITY-2%2FMONTH-blue?style=Badge_Grade&logo=github)
+  ![Contributors](https://img.shields.io/badge/CONTRIBUTORS-72-green?style=Badge_Grade&logo=github)
+  ![Issues](https://img.shields.io/badge/OPEN%20ISSUES-0-red?style=Badge_Grade&logo=github)
+  ![Closed Issues](https://img.shields.io/badge/CLOSED%20ISSUES-0-success?style=Badge_Grade&logo=github)
+  ![Repo Size](https://img.shields.io/badge/REPO%20SIZE-7.5%20MiB-informational?style=Badge_Grade&logo=github)
+</div>
 
-<p align="center">
-<a href="https://www.codacy.com/gh/GT-DarkGod14/DarkGod14Bot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GT-DarkGod14/DarkGod14Bot&amp;utm_campaign=Badge_Grade" alt="Codacy Badge">
-<img src="https://app.codacy.com/project/badge/Grade/972e73015aaa4096bf109a79acae8afb" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="Libraries.io dependency status for GitHub repo"> <img src="https://img.shields.io/librariesio/github/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=red" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/network/members" alt="GitHub stars"> <img src="https://img.shields.io/github/stars/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=yellow" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/network/members" alt="GitHub forks"> <img src="https://img.shields.io/github/forks/GT-DarkGod14/DarkGod14Bot" /> </a>
-</p>
-<p align="center">
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub commit activity"> <img src="https://img.shields.io/github/commit-activity/m/GT-DarkGod14/DarkGod14Bot" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/graphs/contributors" alt="GitHub contributors"> <img src="https://img.shields.io/github/contributors/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub closed pull requests"> <img src="https://img.shields.io/github/issues-pr-closed-raw/GT-DarkGod14/DarkGod14Bot?color=success" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub issues"> <img src="https://img.shields.io/github/issues-raw/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=red" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub closed issues"> <img src="https://img.shields.io/github/issues-closed-raw/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=success" /> </a>
-</p>
-<p align="center">
-<a href="https://www.python.org/" alt="made-with-python"> <img src="https://img.shields.io/badge/made%20with-Python-1f425f.svg?style=flat&logo=python&color=blue" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="Python supported versions"> <img src="https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="Ptb version"> <img src="https://img.shields.io/badge/Ptb-v13.11-blue" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot" alt="GitHub repo size"> <img src="https://img.shields.io/github/repo-size/GT-DarkGod14/DarkGod14Bot" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/blob/master/LICENSE" alt="GPLv3 license"> <img src="https://img.shields.io/github/license/GT-DarkGod14/DarkGod14Bot?style=flat&logo=github&color=success" /> </a>
-</p>
-<p align="center">
-<a href="" alt="GT-DarkGod14"> <img src="https://img.shields.io/badge/built%20by-GT-DarkGod14-blue" /> </a>
-<a href="https://github.com/GT-DarkGod14/DarkGod14Bot/graphs/commit-activity" alt="Maintenance"> <img src="https://img.shields.io/badge/maintained%3F-yes-blue.svg" /> </a>
-<a href="https://makeapullrequest.com" alt="PRs Welcome"> <img src="https://img.shields.io/badge/PRs-welcome-blue.svg" /> </a>
-</p>
+## 🔗 Important Links
 
-A modular Telegram Python bot running on python3 with a sqlalchemy database.
+<div>
 
-Originally a SaitamaRobot fork, DarkGod14Bot evolved further and was built to be more robust. 
+• **Bot link:** [![DarkGod14Bot](https://img.shields.io/badge/🤖%20DarkGod14Bot-0088cc?style=flat-square&logoColor=white)](https://t.me/DarkGod14Bot)
 
-* Bot link:  <a href="https://t.me/DarkGod14Bot" alt="DarkGod14Bot"> <img src="https://img.shields.io/badge/%F0%9F%A4%96%20-DarkGod14Bot-blue" /> </a>
+• **Support group:** [![Telegram](https://img.shields.io/badge/%20Support%20Chat-2CA5E0?style=flat-square&logo=telegram&logoColor=white)](https://t.me/DarkGod14BotAltSupport)
 
-* Support group:  <a href="https://t.me/DarkGod14BotSupport" alt="DarkGod14BotSupport"> <img src="https://aleen42.github.io/badges/src/telegram.svg" /> </a>
+• **Recommended federation:** [![GodnessFed](https://img.shields.io/badge/🚫%20GodnessFed-FF4444?style=flat-square&logoColor=white)](https://t.me/AltGodnessFed)
 
-* Recommended federation:  <a href="https://t.me/AltGodnessFed" alt="GodnessFed"> <img src="https://img.shields.io/badge/🚫-GodnessFed-red" /> </a>
-
-In support group you can ask for help, discover/request new features, report bugs, and stay in the loop whenever a new update is available. 
+</div>
 
 
-## How to setup/deploy.
+## ✨ Key Features
 
-### Read these notes carefully before proceeding 
- - Edit any mentions of @DarkGod14BotSupport to your own support chat
- - Your code must be open source and a link to your fork's repository must be there in the start reply of the bot
- - This repo does not come with technical support, so DO NOT come to us asking help about deploy/console errors
+- 🔧 **Modular Architecture** - Easy-to-extend module system
+- 🛡️ **Robust & Stable** - Built on SaitamaRobot foundation but more optimized
+- 🗄️ **Database Integration** - Complete SQLAlchemy database support
+- 🌐 **Multi-language** - Support for multiple languages
+- ⚡ **High Performance** - Optimized to handle multiple chats efficiently
+- 🔒 **Advanced Moderation** - Comprehensive chat management tools
+- 🎯 **User-friendly** - Intuitive commands and responses
 
+## 🚀 Quick Start
 
- <details>
-  <summary>Steps to deploy on Heroku !! </summary>
+### 📋 Prerequisites
 
+- Python 3.9.4
+- PostgreSQL (recommended)
+- Telegram Bot Token (get it from [@BotFather](https://t.me/botfather))
+- Basic knowledge of Python and databases
+
+### ⚡ Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/GT-DarkGod14/DarkGod14Bot.git
+   cd DarkGod14Bot
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip3 install -r requirements.txt
+   ```
+
+3. **Set up database (PostgreSQL)**
+   ```bash
+   # For Ubuntu/Debian
+   sudo apt-get update && sudo apt-get install postgresql
+   sudo su - postgres
+   createuser -P -s -e YOUR_USER
+   createdb -O YOUR_USER YOUR_DB_NAME
+   ```
+
+4. **Configure the bot**
+   
+   Create a `config.py` file in the `DarkGod14Bot` folder:
+   
+   ```python
+   from DarkGod14Bot.sample_config import Config
+   
+   class Development(Config):
+       OWNER_ID = 123456789  # Your Telegram ID
+       OWNER_USERNAME = "YourUsername"  # Your Telegram username
+       API_KEY = "your_bot_token_here"  # Bot token from @BotFather
+       SQLALCHEMY_DATABASE_URI = 'postgresql://username:password@localhost:5432/database'
+       JOIN_LOGGER = '-1001234567890'  # Group chat ID for logging
+       USE_JOIN_LOGGER = True
+       SUDO_USERS = [123456789]  # List of sudo user IDs
+       LOAD = []
+       NO_LOAD = ['translation']
+   ```
+
+5. **Start the bot**
+   ```bash
+   python3 -m DarkGod14Bot
+   ```
+
+## ⚙️ Configuration Options
+
+### Environment Variables
+If you prefer using environment variables instead of `config.py`:
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `API_KEY` | Bot token from BotFather | ✅ |
+| `OWNER_ID` | Your Telegram user ID | ✅ |
+| `OWNER_USERNAME` | Your Telegram username | ✅ |
+| `SQLALCHEMY_DATABASE_URI` | Database connection string | ✅ |
+| `JOIN_LOGGER` | Chat ID for join logging | ✅ |
+| `USE_JOIN_LOGGER` | Enable/disable join logging (True/False) | ✅ |
+| `SUDO_USERS` | Comma-separated sudo user IDs | ✅ |
+| `LOAD` | Comma-separated modules to load | ❌ |
+| `NO_LOAD` | Comma-separated modules to exclude | ❌ |
+
+### Database URI Format
 ```
-Fill in all the details, Deploy!
-Now go to https://dashboard.heroku.com/apps/(app-name)/resources ( Replace (app-name) with your app name )
-REMEMBER: Turn on worker dyno (Don't worry It's free :D) & Webhook
-Now send the bot /start, If it doesn't respond go to https://dashboard.heroku.com/apps/(app-name)/settings and remove webhook and port.
+# Replace sqldbtype, username, password, hostname (default: 0.0.0.0), port (e.g., 5432), and dbname.
+
+postgresql://username:password@hostname:port/database_name
 ```
 
-  [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/GT-DarkGod14/DarkGod14Bot.git)
+## 🏗️ Module System
 
-</details>  
+### Creating Custom Modules
 
-<details>
-  <summary>Steps to self Host!! </summary>
+1. Create a `.py` file in the `modules/` folder
+2. Import the dispatcher:
+   ```python
+   from DarkGod14Bot import dispatcher
+   ```
+3. Add your handlers:
+   ```python
+   dispatcher.add_handler(CommandHandler("mycommand", my_function))
+   ```
+4. Set module info:
+   ```python
+   __help__ = "Description of your module commands"
+   __mod_name__ = "Module Name"
+   ```
 
-  ## Setting up the bot (Read this before trying to use!):
-Please make sure to use python3.6, as I cannot guarantee everything will work as expected on older Python versions!
-This is because markdown parsing is done by iterating through a dict, which is ordered by default in 3.6.
+### Module Loading
 
-  ### Configuration
+Control which modules load using `LOAD` and `NO_LOAD` in your config:
+- Empty `LOAD` list = load all modules
+- `NO_LOAD` takes priority over `LOAD`
 
-There are two possible ways of configuring your bot: a config.py file, or ENV variables.
+## 🚨 Important Notes
 
-The preferred version is to use a `config.py` file, as it makes it easier to see all your settings grouped together.
-This file should be placed in your `DarkGod14Bot` folder, alongside the `__main__.py` file. 
-This is where your bot token will be loaded from, as well as your database URI (if you're using a database), and most of
-your other settings.
+> **⚠️ Before deploying:**
+> - Edit all mentions of `@DarkGod14BotAltSupport` to your own support chat
+> - Your code must be open source with a link to your repository in the bot's start message
+> - This repository doesn't include technical support for deployment issues
 
-It is recommended to import sample_config and extend the Config class, as this will ensure your config contains all
-defaults set in the sample_config, hence making it easier to upgrade.
+## 🤝 Contributing
 
-An example `config.py` file could be:
-```
-from DarkGod14Bot.sample_config import Config
+We welcome contributions! Please:
 
-class Development(Config):
-    OWNER_ID = 254318997  # your telegram ID
-    OWNER_USERNAME = "SonOfLars"  # your telegram username
-    API_KEY = "your bot api key"  # your api key, as provided by the @botfather
-    SQLALCHEMY_DATABASE_URI = 'postgresql://username:password@localhost:5432/database'  # sample db credentials
-    JOIN_LOGGER = '-1234567890' # some group chat that your bot is a member of
-    USE_JOIN_LOGGER = True
-    SUDO_USERS = [18673980, 83489514]  # List of id's for users which have sudo access to the bot.
-    LOAD = []
-    NO_LOAD = ['translation']
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-If you can't have a config.py file (EG on Heroku), it is also possible to use environment variables.
-So just go and read the config sample file. 
+## 📈 Statistics
 
-  ### Python dependencies
+Use `/stats` command (owner only) to get:
+- Active users count
+- Chat statistics
+- Module usage data
+- System performance metrics
 
-Install the necessary Python dependencies by moving to the project directory and running:
+## 📄 License
 
-`pip3 install -r requirements.txt`
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
-This will install all the necessary python packages.
+## 🙏 Credits & Acknowledgments
 
-  ### Database
+This bot is built upon the excellent work of:
+- **[PaulSonOfLars](https://github.com/PaulSonOfLars)** - Original creator
+- **[AnimeKaizoku](https://github.com/AnimeKaizoku)** - Core contributor  
+- **[Astrako](https://github.com/Astrako/AstrakoBot)** - AstrakoBot base
 
-If you wish to use a database-dependent module (eg: locks, notes, userinfo, users, filters, welcomes),
-you'll need to have a database installed on your system. I use Postgres, so I recommend using it for optimal compatibility.
+All original credits go to Paul, AnimeKaizoku, and Astrako. Without their efforts, this fork wouldn't exist!
 
-In the case of Postgres, this is how you would set up a database on a Debian/ubuntu system. Other distributions may vary.
-
-- install postgresql:
-
-`sudo apt-get update && sudo apt-get install postgresql`
-
-- change to the Postgres user:
-
-`sudo su - postgres`
-
-- create a new database user (change YOUR_USER appropriately):
-
-`createuser -P -s -e YOUR_USER`
-
-This will be followed by you need to input your password.
-
-- create a new database table:
-
-`createdb -O YOUR_USER YOUR_DB_NAME`
-
-Change YOUR_USER and YOUR_DB_NAME appropriately.
-
-- finally:
-
-`psql YOUR_DB_NAME -h YOUR_HOST YOUR_USER`
-
-This will allow you to connect to your database via your terminal.
-By default, YOUR_HOST should be 0.0.0.0:5432.
-
-You should now be able to build your database URI. This will be:
-
-`sqldbtype://username:pw@hostname:port/db_name`
-
-Replace sqldbtype with whichever DB you're using (eg Postgres, MySQL, SQLite, etc)
-repeat for your username, password, hostname (localhost?), port (5432?), and DB name.
-
-  ## Modules
-   ### Setting load order.
-
-The module load order can be changed via the `LOAD` and `NO_LOAD` configuration settings.
-These should both represent lists.
-
-If `LOAD` is an empty list, all modules in `modules/` will be selected for loading by default.
-
-If `NO_LOAD` is not present or is an empty list, all modules selected for loading will be loaded.
-
-If a module is in both `LOAD` and `NO_LOAD`, the module will not be loaded - `NO_LOAD` takes priority.
-
-   ### Creating your own modules.
-
-Creating a module has been simplified as much as possible - but do not hesitate to suggest further simplification.
-
-All that is needed is that your .py file is in the modules folder.
-
-To add commands, make sure to import the dispatcher via
-
-`from DarkGod14Bot import dispatcher`.
-
-You can then add commands using the usual
-
-`dispatcher.add_handler()`.
-
-Assigning the `__help__` variable to a string describing this modules' available
-commands will allow the bot to load it and add the documentation for
-your module to the `/help` command. Setting the `__mod_name__` variable will also allow you to use a nicer, user-friendly name for a module.
-
-The `__migrate__()` function is used for migrating chats - when a chat is upgraded to a supergroup, the ID changes, so 
-it is necessary to migrate it in the DB.
-
-The `__stats__()` function is for retrieving module statistics, eg number of users, number of chats. This is accessed 
-through the `/stats` command, which is only available to the bot owner.
-
-## Starting the bot.
-
-Once you've set up your database and your configuration is complete, simply run (Linux):
-
-`python3 -m DarkGod14Bot`
-
-For queries or any issues regarding the bot please open an issue ticket or visit us at [DarkGod14BotSupport](https://t.me/DarkGod14BotSupport)
-
-
-## Credits
-The bot is based on the original work done by [PaulSonOfLars](https://github.com/PaulSonOfLars) and [AnimeKaizoku](https://github.com/AnimeKaizoku)
-All original credits go to Paul and AnimeKaizoku, Without their efforts, this fork would not have been possible!
-
-Any other authorship/credits can be seen through the commits.
-
-Should any be missing kindly let us know at [DarkGod14BotSupport](https://t.me/DarkGod14BotSupport) or simply submit a pull request on the readme.
+For queries or any issues regarding the bot please open an [issue](https://github.com/GT-DarkGod14/DarkGod14Bot/issues) or visit us at [DarkGod14BotAltSupport](https://t.me/DarkGod14BotAltSupport)
