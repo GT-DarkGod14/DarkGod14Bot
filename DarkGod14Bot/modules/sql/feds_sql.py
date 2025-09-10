@@ -685,7 +685,16 @@ def get_fed_log(fed_id):
         return False
     elif fed_setting.get("flog"):
         try:
-            dispatcher.bot.get_chat(fed_setting.get("flog"))
+            chat = dispatcher.bot.get_chat(fed_setting.get("flog"))
+            if chat.type == "channel":
+                try:
+                    bot_member = dispatcher.bot.get_chat_member(chat.id, dispatcher.bot.id)
+                    if not (bot_member.can_post_messages or bot_member.status == "administrator"):
+                        set_fed_log(fed_id, None)
+                        return False
+                except:
+                    set_fed_log(fed_id, None)
+                    return False
         except BadRequest:
             set_fed_log(fed_id, None)
             return False
