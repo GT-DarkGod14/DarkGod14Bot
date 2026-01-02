@@ -100,7 +100,7 @@ And the following:
     "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n",
 )
 
-DARKGOD14BOT_IMG = "https://i.imgur.com/im3kCJr.png"
+DARKGOD14BOT_IMG = "https://raw.githubusercontent.com/GT-DarkGod14/DarkGod14Bot/main/resources/DarkGod14BotProfile.png"
 IMPORTED = {}
 MIGRATEABLE = []
 HELPABLE = {}
