@@ -1,5 +1,6 @@
 <div align="center">
-  <img src="https://i.imgur.com/im3kCJr.png" alt="DarkGod14Bot Logo" width="500"/>
+  <img src="https://raw.githubusercontent.com/GT-DarkGod14/DarkGod14Bot/main/resources/DarkGod14BotProfile.png
+    " alt="DarkGod14Bot Logo" width="500"/>
   <div align="center">
 <h1 style="font-size: 3em;">🤖 DarkGod14Bot</h1>
 </div>
