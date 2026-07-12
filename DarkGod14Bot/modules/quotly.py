@@ -225,7 +225,7 @@ async def process(msg, user, client, reply, replied=None):
     space = pfpbg.width + 30
     namefallback = ImageFont.truetype("resources/Quivira.otf", 43, encoding="utf-16")
     for letter in tot:
-        if letter in emoji.UNICODE_EMOJI:
+        if letter in emoji.EMOJI_DATA:
             newemoji, mask = await emoji_fetch(letter)
             canvas.paste(newemoji, (space, 24), mask)
             space += 40
@@ -274,7 +274,7 @@ async def process(msg, user, client, reply, replied=None):
                         "resources/Roboto-Regular.ttf", 30, encoding="utf-16"
                     )
                     textcolor = "#898989"
-            if letter in emoji.UNICODE_EMOJI:
+            if letter in emoji.EMOJI_DATA:
                 newemoji, mask = await emoji_fetch(letter)
                 canvas.paste(newemoji, (x, y - 2), mask)
                 x += 45
