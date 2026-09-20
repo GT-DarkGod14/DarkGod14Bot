@@ -5,9 +5,9 @@
 
 from datetime import datetime
 import re
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 from bs4 import BeautifulSoup
-from requests import get
+from requests import get, Session, RequestException
 from telegram import Bot, Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler
 from telegram.ext import CallbackContext, run_async
@@ -375,6 +375,186 @@ def twrp(update: Update, context: CallbackContext):
         context.dispatcher.run_async(delete, delmsg, cleartime.time)
 
 
+GSM_SEARCH_HOSTS = ("https://m.gsmarena.com", "https://www.gsmarena.com")
+GSM_PAGE_HOSTS = ("https://www.gsmarena.com", "https://m.gsmarena.com")
+
+gsm_headers = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+_GSM_PHONE_SLUG = re.compile(r"^[^/]+-\d+\.php$")
+_GSM_NOT_PHONE = re.compile(
+    r"-(?:phones|reviews?|pictures|news|videos|related|compare|opinions)-", re.I
+)
+
+
+class GSMArenaBlocked(Exception):
+    pass
+
+
+def _gsm_is_blocked(response):
+    if response.status_code in (403, 429, 503):
+        return True
+    head = response.text[:4000].lower()
+    return "turnstile" in head or "one quick check before you continue" in head
+
+
+def _gsm_get(session, path, hosts, params=None):
+    blocked = False
+    last_error = None
+    for host in hosts:
+        try:
+            resp = session.get(
+                host + path, params=params, headers=gsm_headers, timeout=15
+            )
+        except RequestException as e:
+            last_error = e
+            continue
+        if _gsm_is_blocked(resp):
+            blocked = True
+            continue
+        if resp.status_code == 200:
+            return resp
+        last_error = RuntimeError(f"HTTP {resp.status_code} from {host}")
+    if blocked:
+        raise GSMArenaBlocked()
+    raise last_error or RuntimeError("GSMArena request failed")
+
+
+def _gsm_norm(text):
+    return re.sub(r"[^a-z0-9]+", "", text.lower())
+
+
+def _gsm_tokens(text):
+    return re.findall(r"[a-z0-9]+", text.lower())
+
+
+def _gsm_extract_candidates(soup):
+    containers = [
+        soup.select_one("div.makers"),
+        soup.select_one("div#review-body"),
+        soup.select_one("div.section-body"),
+        soup,
+    ]
+    for container in containers:
+        if container is None:
+            continue
+        found, seen = [], set()
+        for a in container.find_all("a", href=True):
+            slug = urlparse(a["href"]).path.rsplit("/", 1)[-1]
+            if not _GSM_PHONE_SLUG.match(slug) or _GSM_NOT_PHONE.search(slug):
+                continue
+            if slug in seen:
+                continue
+            seen.add(slug)
+            name = a.get_text(" ", strip=True)
+            if not name and a.find("img"):
+                name = (a.find("img").get("title") or a.find("img").get("alt") or "").strip()
+            if not name:
+                name = re.sub(r"-\d+\.php$", "", slug).replace("_", " ")
+            found.append((name, slug))
+        if found:
+            return found
+    return []
+
+
+def _gsm_pick_best(query, candidates):
+    q_norm = _gsm_norm(query)
+    q_tokens = _gsm_tokens(query)
+    if not q_tokens:
+        return None
+    best, best_score = None, 0.0
+    for idx, (name, slug) in enumerate(candidates):
+        n_norm = _gsm_norm(name)
+        n_tokens = set(_gsm_tokens(name))
+        ratio = sum(1 for t in q_tokens if t in n_tokens) / len(q_tokens)
+        if ratio < 0.5:
+            continue
+        score = ratio
+        if n_norm == q_norm:
+            score += 2
+        elif n_norm.endswith(q_norm):
+            score += 1.5
+        elif q_norm in n_norm:
+            score += 0.5
+        extra = len(n_tokens) - len(q_tokens)
+        if extra > 0:
+            score -= 0.05 * extra
+        score -= idx * 0.001
+        if score > best_score:
+            best, best_score = (name, slug), score
+    return best
+
+
+def _gsm_parse_specs(soup):
+    all_specs = {}
+    for table in soup.find_all("table"):
+        current = None
+        last_name = None
+        for row in table.find_all("tr"):
+            th = row.find("th")
+            if th:
+                current = th.get_text(" ", strip=True)
+                all_specs.setdefault(current, {})
+                last_name = None
+            ttl = row.find("td", class_="ttl")
+            nfo = row.find("td", class_="nfo")
+            if not (ttl and nfo and current):
+                continue
+            name = ttl.get_text(" ", strip=True)
+            value = re.sub(r"\s+", " ", nfo.get_text(" ", strip=True)).strip()
+            if not value or value == "-":
+                continue
+            if name:
+                all_specs[current][name] = value
+                last_name = name
+            elif last_name:
+                all_specs[current][last_name] += "; " + value
+    return {k: v for k, v in all_specs.items() if v}
+
+
+def _gsm_md(text):
+    return re.sub(r"([_*`\[])", r"\\\1", text)
+
+
+def _gsm_format(phone_name, all_specs, phone_url):
+    msg = f"*📱 {_gsm_md(phone_name)}*\n\n"
+    important_order = [
+        "Network", "Launch", "Body", "Display", "Platform",
+        "Memory", "Main Camera", "Selfie Camera", "Battery",
+    ]
+
+    def block(cat_name, specs_dict, limit):
+        out = f"*{_gsm_md(cat_name.upper())}*\n"
+        for spec_name, spec_value in list(specs_dict.items())[:limit]:
+            spec_value = spec_value.replace("`", "'")
+            if len(spec_value) > 100:
+                spec_value = spec_value[:100] + "..."
+            out += f"• *{_gsm_md(spec_name)}*: `{spec_value}`\n"
+        return out + "\n"
+
+    shown = set()
+    for wanted in important_order:
+        for cat_name, specs_dict in all_specs.items():
+            if cat_name not in shown and wanted.lower() in cat_name.lower():
+                msg += block(cat_name, specs_dict, 5)
+                shown.add(cat_name)
+                break
+    for cat_name, specs_dict in all_specs.items():
+        if cat_name not in shown and len(msg) < 3500:
+            msg += block(cat_name, specs_dict, 3)
+
+    msg += f"[Full specs on GSMArena]({phone_url})"
+    if len(msg) > 4000:
+        msg = msg[:3900] + f"\n\n`...truncated`\n[Full specs on GSMArena]({phone_url})"
+    return msg
+
+
 def specs(update: Update, context: CallbackContext):
     message = update.effective_message
     chat = update.effective_chat
@@ -383,142 +563,70 @@ def specs(update: Update, context: CallbackContext):
         device_query = " ".join(args)
     else:
         device_query = message.text[len("/specs "):].strip()
-    if not device_query:
-        msg = 'Give me something to search, like:\n`/specs iPhone 15 Pro`\nor\n`/specs Samsung Galaxy S24`'
-        delmsg = message.reply_text(text=msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+
+    def finish(text, delete_search=True):
+        if delete_search:
+            try:
+                search_msg.delete()
+            except Exception:
+                pass
+        delmsg = message.reply_text(
+            text=text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
+        )
         cleartime = get_clearcmd(chat.id, "specs")
         if cleartime:
             context.dispatcher.run_async(delete, delmsg, cleartime.time)
+
+    if not device_query:
+        search_msg = None
+        finish(
+            'Give me something to search, like:\n`/specs iPhone 15 Pro`\nor\n`/specs Samsung Galaxy S24`',
+            delete_search=False,
+        )
         return
+
     search_msg = message.reply_text(f"🔍 Searching specifications for {device_query}...")
+    manual_url = f"https://www.gsmarena.com/results.php3?sQuickSearch=yes&sName={quote(device_query)}"
+
     try:
-        search_url = f"https://www.gsmarena.com/results.php3?sQuickSearch=yes&sName={quote(device_query)}"
-        response = get(search_url, headers=rget_headers, timeout=10)
-        if response.status_code != 200:
-            msg = f"⚠️ Error searching for {device_query}"
-            search_msg.edit_text(msg)
+        session = Session()
+
+        resp = _gsm_get(
+            session, "/results.php3", GSM_SEARCH_HOSTS,
+            params={"sQuickSearch": "yes", "sName": device_query},
+        )
+        candidates = _gsm_extract_candidates(BeautifulSoup(resp.content, "html.parser"))
+        best = _gsm_pick_best(device_query, candidates)
+        if not best:
+            finish(f"⚠️ No results found for {_gsm_md(device_query)}")
             return
-        soup = BeautifulSoup(response.content, 'html.parser')
-        device_links = []
-        makers_div = soup.find('div', class_='makers')
-        if makers_div:
-            links = makers_div.find_all('a', href=True)
-            for link in links:
-                href = link.get('href')
-                if href and href.endswith('.php'):
-                    device_links.append(f"https://www.gsmarena.com/{href}")
-        if not device_links:
-            msg = f"⚠️ No results found for {device_query}"
-            search_msg.edit_text(msg)
-            return
-        phone_url = None
-        device_query_lower = device_query.lower().replace(' ', '')
-        for link in device_links:
-            link_name = link.split('/')[-1].replace('.php', '').replace('_', ' ').replace('-', ' ')
-            link_name_clean = link_name.lower().replace(' ', '')
-            if link_name_clean == device_query_lower:
-                phone_url = link
-                break
-        if not phone_url:
-            best_match = None
-            best_score = 0
-            for link in device_links:
-                link_name = link.split('/')[-1].replace('.php', '').replace('_', ' ').replace('-', ' ')
-                link_name_clean = link_name.lower().replace(' ', '')
-                score = 0
-                query_words = device_query.lower().split()
-                link_words = link_name.lower().split()
-                matching_words = sum(1 for word in query_words if word in link_words)
-                score = matching_words / len(query_words) if query_words else 0
-                if device_query_lower in link_name_clean:
-                    score += 0.5
-                extra_words = len(link_words) - len(query_words)
-                if extra_words > 0:
-                    score -= (extra_words * 0.1)
-                if score > best_score:
-                    best_score = score
-                    best_match = link
-            phone_url = best_match if best_match else device_links[0]
-        phone_response = get(phone_url, headers=rget_headers, timeout=10)
-        if phone_response.status_code != 200:
-            msg = "⚠️ Error loading device page"
-            search_msg.edit_text(msg)
-            return
-        phone_soup = BeautifulSoup(phone_response.content, 'html.parser')
-        phone_name = None
-        name_elem = phone_soup.find('h1', class_='specs-phone-name-title')
-        if name_elem:
-            phone_name = name_elem.get_text().strip()
-        if not phone_name:
-            phone_name = device_query.title()
-        all_specs = {}
-        specs_div = phone_soup.find('div', {'id': 'specs-list'})
-        if specs_div:
-            tables = specs_div.find_all('table', {'cellspacing': '0'})
-            for table in tables:
-                current_category = None
-                rows = table.find_all('tr')
-                for row in rows:
-                    th = row.find('th', {'scope': 'row'})
-                    if th:
-                        current_category = th.get_text().strip()
-                        if current_category not in all_specs:
-                            all_specs[current_category] = {}
-                    ttl_cell = row.find('td', {'class': 'ttl'})
-                    nfo_cell = row.find('td', {'class': 'nfo'})
-                    if ttl_cell and nfo_cell:
-                        spec_name_elem = ttl_cell.find('a')
-                        if spec_name_elem:
-                            spec_name = spec_name_elem.get_text().strip()
-                        else:
-                            spec_name = ttl_cell.get_text().strip()
-                        spec_value = nfo_cell.get_text().strip()
-                        spec_value = re.sub(r'\s+', ' ', spec_value).strip()
-                        if spec_name and spec_value and spec_value != '-' and current_category:
-                            if len(spec_value) > 200:
-                                spec_value = spec_value[:200] + "..."
-                            all_specs[current_category][spec_name] = spec_value
+        phone_name, slug = best
+
+        phone_resp = _gsm_get(session, "/" + slug, GSM_PAGE_HOSTS)
+        phone_soup = BeautifulSoup(phone_resp.content, "html.parser")
+        phone_url = f"https://www.gsmarena.com/{slug}"
+
+        name_elem = phone_soup.find("h1", class_="specs-phone-name-title") or phone_soup.find("h1")
+        if name_elem and name_elem.get_text(strip=True):
+            phone_name = name_elem.get_text(" ", strip=True)
+
+        all_specs = _gsm_parse_specs(phone_soup)
         if all_specs:
-            msg = f"*📱 {phone_name}*\n\n"
-            important_order = ['Network', 'Launch', 'Body', 'Display', 'Platform', 'Memory', 'Main Camera', 'Selfie Camera', 'Battery']
-            shown_categories = []
-            for category in important_order:
-                for cat_name, specs in all_specs.items():
-                    if category.lower() in cat_name.lower() and specs:
-                        msg += f"*{cat_name.upper()}*\n"
-                        count = 0
-                        for spec_name, spec_value in specs.items():
-                            if count < 5:
-                                if len(spec_value) > 100:
-                                    spec_value = spec_value[:100] + "..."
-                                msg += f"• *{spec_name}*: `{spec_value}`\n"
-                                count += 1
-                        msg += "\n"
-                        shown_categories.append(cat_name)
-                        break
-            for cat_name, specs in all_specs.items():
-                if cat_name not in shown_categories and len(msg) < 3500:
-                    if specs:
-                        msg += f"*{cat_name.upper()}*\n"
-                        count = 0
-                        for spec_name, spec_value in specs.items():
-                            if count < 3:
-                                if len(spec_value) > 100:
-                                    spec_value = spec_value[:100] + "..."
-                                msg += f"• *{spec_name}*: `{spec_value}`\n"
-                                count += 1
-                        msg += "\n"
-            if len(msg) > 4000:
-                msg = msg[:3900] + "\n\n`...truncated`"
+            msg = _gsm_format(phone_name, all_specs, phone_url)
         else:
-            msg = f"*📱 {phone_name}*\n\n`⚠️ Could not extract specifications`\n`Try checking manually:` {phone_url}"
+            msg = (
+                f"*📱 {_gsm_md(phone_name)}*\n\n`⚠️ Could not extract specifications`\n"
+                f"Try checking manually: {phone_url}"
+            )
+    except GSMArenaBlocked:
+        msg = (
+            "⚠️ GSMArena is blocking automated requests right now (anti-bot check).\n"
+            f"Try again in a few minutes or search manually: {manual_url}"
+        )
     except Exception as e:
-        msg = f"⚠️ Error processing {device_query}: `{str(e)}`"
-    search_msg.delete()
-    delmsg = message.reply_text(text=msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
-    cleartime = get_clearcmd(chat.id, "specs")
-    if cleartime:
-        context.dispatcher.run_async(delete, delmsg, cleartime.time)
+        msg = f"⚠️ Error processing {_gsm_md(device_query)}: `{str(e)}`"
+
+    finish(msg)
 
 
 
